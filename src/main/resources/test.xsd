@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www/schema" targetNamespace="http://www/schema" elementFormDefault="qualified" >
+
+    <complexType name="HerdInfo">
+    	<sequence>
+    	<element name="location" type="string"></element>
+    		<element name="bcs_promedio" type="float"></element>
+    		<element name="cows" type="tns:AnimalInfo" maxOccurs="unbounded" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+
+	<complexType name="Cow">
+    	<sequence>
+    		<element name="id" type="unsignedInt" ></element>
+    		<element name="electronic-id" type="unsignedInt" ></element>
+    		<element name="fecha_nacimiento" type="date" ></element>
+    		<element name="ultima_fecha_parto" type="date" ></element>
+    		<element name="cantidad_partos" type="unsignedInt" ></element>
+    		<element name="peso" type="float" ></element>
+    		<element name="herd_id" type="unsignedInt" ></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="CowBcs">
+    	<sequence>
+    		<element name="id" type="unsignedInt"></element>
+    		<element name="cow_id" type="unsignedInt"></element>
+    		<element name="fecha" type="date"></element>
+    		<element name="cc" type="float"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="Herd">
+    	<sequence>
+    		<element name="id" type="unsignedInt"></element>
+    		<element name="cows" type="tns:Cow" maxOccurs="unbounded" minOccurs="0"></element>
+    		<element name="location" type="string"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="AnimalAlert">
+    	<sequence>
+    		<element name="animal_id" type="unsignedInt"></element>
+    		<element name="bcs_threshold_max" type="float"></element>
+    		<element name="bcs_threshold_min" type="float"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="HerdAlert">
+    	<sequence>
+    		<element name="herd_id" type="long"></element>
+    		<element name="bcs_threshold_max" type="float"></element>
+    		<element name="bcs_threshold_min" type="float"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="createCowRequest">
+        <complexType>
+            <sequence>
+				<element name="electronic-id" type="unsignedInt" maxOccurs="1" minOccurs="1"></element>
+				<element name="fecha_nacimiento" type="date" maxOccurs="1" minOccurs="1"></element>
+				<element name="ultima_fecha_parto" type="date" maxOccurs="1" minOccurs="0"></element>
+				<element name="cantidad_partos" type="unsignedInt" maxOccurs="1" minOccurs="1"></element>
+				<element name="peso" type="float" maxOccurs="1" minOccurs="1"></element>
+				<element name="herd_id" type="unsignedInt" maxOccurs="1" minOccurs="1"></element>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="createCowResponse" >
+        <complexType>
+            <sequence>
+                <element name="result" type="int"/>
+            </sequence>
+        </complexType>
+    </element>
+
+
+    <element name="getInfoAnimalRequest">
+        <complexType>
+            <sequence>
+                <element name="id" type="unsignedInt" maxOccurs="1" minOccurs="1"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="getInfoAnimalResponse">
+		<complexType>
+            <sequence>
+                <element name="data" type="tns:AnimalInfo"/>
+            </sequence>
+        </complexType>
+   	</element>
+
+    <complexType name="AnimalInfo">
+    	<sequence>
+    		<element name="id" type="unsignedInt"></element>
+    		<element name="electronic_id" type="unsignedInt"></element>
+    		<element name="fecha_nacimiento" type="date"></element>
+    		<element name="ultima_fecha_parto" type="date"></element>
+    		<element name="cantidad_partos" type="unsignedInt"></element>
+    		<element name="peso" type="float"></element>
+    		<element name="herd_id" type="unsignedInt"></element>
+    		<element name="cowBcs_id" type="unsignedInt"></element>
+    		<element name="fechaBcs" type="date" ></element>
+    		<element name="cc" type="float"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="getInfoRodeoRequest" >
+    	<complexType>
+	    	<sequence>
+	    		<element name="id" type="unsignedInt" maxOccurs="1" minOccurs="1"></element>
+	    	</sequence>
+	    </complexType>
+    </element>
+    
+    <element name="getInfoRodeoResponse" >
+    	<complexType>
+	    	<sequence>
+	    		<element name="info_herd" type="tns:HerdInfo"></element>
+	    	</sequence>
+	    </complexType>
+    </element>
+
+    <element name="setHerdAlertRequest">
+        <complexType>
+            <sequence>
+                <element name="herd_id" type="unsignedInt" maxOccurs="1" minOccurs="1"/>
+                <element name="bcs_threshold_max" type="float" maxOccurs="1" minOccurs="1"/>
+                <element name="bcs_threshold_min" type="float" maxOccurs="1" minOccurs="1"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="setHerdAlertResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="setAnimalAlertRequest">
+        <complexType>
+            <sequence>
+                <element name="animal_id" type="unsignedInt" maxOccurs="1" minOccurs="1"/>
+                <element name="bcs_threshold_max" type="float" maxOccurs="1" minOccurs="1"/>
+                <element name="bcs_threshold_min" type="float" maxOccurs="1" minOccurs="1"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="setAnimalAlertResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="addBcsRequest">
+        <complexType>
+            <sequence>
+                <element name="cow_id" type="unsignedInt" maxOccurs="1" minOccurs="1"/>
+                <element name="fecha" type="date" maxOccurs="1" minOccurs="1"/>
+                <element name="cc" type="float" maxOccurs="1" minOccurs="1"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="addBcsResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="boolean"/>
+            </sequence>
+        </complexType>
+    </element>
+    
+    <element name="addHerdRequest">
+        <complexType>
+            <sequence>
+                <element name="location" type="string" maxOccurs="1" minOccurs="1"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="addHerdResponse">
+        <complexType>
+            <sequence>
+                <element name="result" type="unsignedInt"/>
+            </sequence>
+        </complexType>
+    </element>
+</schema>

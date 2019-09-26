@@ -1,0 +1,13 @@
+# Generated class xds
+**/Herd.java
+**/HerdAlert.java
+**/HerdInfo.java
+**/CowBcs.java
+**/Cow.java
+**/AnimalInfo.java
+**/AnimalAlert.java
+**/*Response.java
+**/*Request.java
+
+/target/
+/Requests/
