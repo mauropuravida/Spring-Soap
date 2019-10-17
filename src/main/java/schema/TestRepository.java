@@ -104,11 +104,12 @@ public class TestRepository {
 	//IA que ingresa bcs
 	public boolean addCowBcs(AddBcsRequest request) {
 		//si existe el id de vaca y la fecha de bcs es mayor al nacimiento
-		if(cows.containsKey(request.getCowId()) && cows.get(request.getCowId()).getFechaNacimiento().compare(request.getFecha()) != -1)
-			return false;
+		if(cows.containsKey(request.getCowId()))
+			if (cows.get(request.getCowId()).getFechaNacimiento().compare(request.getFecha()) != -1)
+				return false;
 		
 		//condicion corporal >=1 ,<=9
-		if(request.getCc() <1 || request.getCc() >9)
+		if(request.getCc() <1.0f || request.getCc() >9.0f)
 			return false;
 		
 		//comprobar que la fecha sea mayor al bcs anterior, si lo hay .
@@ -118,10 +119,13 @@ public class TestRepository {
 		}
 		
 		//comprobar si hay alerta de vaca para esa condicion
-		if ((animalAlerts.containsKey(request.getCowId())&& animalAlerts.get(request.getCowId()).getBcsThresholdMin() >= request.getCc()) ||
-				(animalAlerts.containsKey(request.getCowId())&& animalAlerts.get(request.getCowId()).getBcsThresholdMax() <= request.getCc()))
-			AlertaCow();		
-		
+		if (animalAlerts.containsKey(request.getCowId())){
+				float lim_inf = animalAlerts.get(request.getCowId()).getBcsThresholdMin();
+				float lim_sup = animalAlerts.get(request.getCowId()).getBcsThresholdMax();
+				if ( animalAlerts.get(request.getCowId()).getBcsThresholdMin() >= request.getCc() || animalAlerts.get(request.getCowId()).getBcsThresholdMax() <= request.getCc()) 
+					AlertaCow(request.getCowId(), lim_inf, lim_sup, request.getCc());
+		}
+	
 		CowBcs cb = new CowBcs();
 		cb.setCowId(request.getCowId());
 		cb.setFecha(request.getFecha());
@@ -132,30 +136,39 @@ public class TestRepository {
 			cb.setId(cowBcss.get(cb.getCowId()).size());
 			cowBcss.get(cb.getCowId()).add(cb);
 		}
-		else {
+		else {//Los limites rigen solo para los bcs posteriores a la configuracion de las alertas
 			Vector<CowBcs> v = new Vector<CowBcs>();
 			cb.setId(0);
 			v.add(cb);
 			cowBcss.put(cb.getCowId(), v);
 		}
 		
-		long index = getInfoCow(request.getCowId()).getHerdId();
+		long herd = getInfoCow(request.getCowId()).getHerdId();
 		
 		//comprobar si hay alerta de rodeo
-		if (herdAlerts.containsKey(index)) {
-			float max = herdAlerts.get(index).getBcsThresholdMax();
-			float min = herdAlerts.get(index).getBcsThresholdMin();
-			float prom = calcularBcsProm(index, null);
+		if (herdAlerts.containsKey(herd)) {
+			float max = herdAlerts.get(herd).getBcsThresholdMax();
+			float min = herdAlerts.get(herd).getBcsThresholdMin();
+			float prom = calcularBcsProm(herd, null);
 			if(min >= prom || max <= prom)
-				AlertaHerd();
+				AlertaHerd(herd, min, max, prom);
 		}
 		return true;
 	}
 
 	//agregar alerta a vaca
 	public boolean setAnimalAlert(SetAnimalAlertRequest request) {
+		//Los limites rigen solo para los bcs posteriores a la configuracion de las alertas
 		//control de que exista el animal
 		if (!cows.containsKey(request.getAnimalId()))
+			return false;
+		
+		//limintes >=1 ,<=9
+		if(request.getBcsThresholdMin() <1.0f || request.getBcsThresholdMax() >9.0f)
+			return false;
+		
+		//control min >= a max
+		if (request.getBcsThresholdMin()>= request.getBcsThresholdMax())
 			return false;
 		
 		AnimalAlert a = new AnimalAlert();
@@ -169,8 +182,17 @@ public class TestRepository {
 
 	//agregar limite de alerta a rodeo
 	public boolean setHerdAlert(SetHerdAlertRequest request) {
+		//Los limites rigen solo para los bcs posteriores a la configuracion de las alertas
 		//control de que exista el herd
 		if (!herds.containsKey(request.getHerdId()))
+			return false;
+		
+		//limintes >=1 ,<=9
+		if(request.getBcsThresholdMin() <1.0f || request.getBcsThresholdMax() >9.0f)
+			return false;
+		
+		//control min >= a max
+		if (request.getBcsThresholdMin()>= request.getBcsThresholdMax())
 			return false;
 		
 		HerdAlert a = new HerdAlert();
@@ -182,14 +204,14 @@ public class TestRepository {
 		 return true;
 	}
 	
-	private void AlertaCow() {
+	private void AlertaCow(long cow_id, float lim_inf, float lim_sup, float cc) {
 		//NO HAY COMPORTAMIENTO DEFINIDO PARA ESTA FUNCION
-		System.out.print("ALERTA! EL BCS DE LA VACA ESTA AL LIMITE\n");
+		System.out.print("ALERTA! EL BCS DE LA VACA "+cow_id+" ES DE "+cc+", SE ENCUENTRA FUERA DE O EN LOS LIMITES: <"+lim_inf+"><"+lim_sup+"> \n");
 	}
 	
-	private void AlertaHerd() {
+	private void AlertaHerd(long herd_id, float lim_inf, float lim_sup, float prom) {
 		//NO HAY COMPORTAMIENTO DEFINIDO PARA ESTA FUNCION
-		System.out.print("ALERTA! EL BCS DEl RODEO ESTA AL LIMITE\n");
+		System.out.print("ALERTA! EL BCS PROMEDIO DEl RODEO "+herd_id+" ES DE "+prom+", SE ENCUENTRA FUERA DE O EN LOS LIMITES: <"+lim_inf+"><"+lim_sup+"> \n");
 	}
 
 	//obtener toda la informacion del rodeo

@@ -22,7 +22,6 @@ public class TestEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getInfoAnimalRequest")
     @ResponsePayload
     public GetInfoAnimalResponse getInfoCow(@RequestPayload GetInfoAnimalRequest request) {
-    	System.out.print("get animal");
     	GetInfoAnimalResponse response = new GetInfoAnimalResponse();
         response.setData(testRepository.getInfoCow(request.getId()));
         return response;
